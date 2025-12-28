@@ -28,3 +28,27 @@ Key Learning:
     Enhanced understanding of E-commerce ecosystems, including business models, marketing strategies, payment systems, and platform functionalities.
     Proficiency in utilizing Odoo for business management, encompassing various modules tailored for E-commerce operations.
     Practical application of Object-Oriented Analysis and Design principles to conceptualize, model, and develop scalable and maintainable software systems for E-commerce ventures.
+
+
+```mermaid
+flowchart TD
+    A[Raw CSV Inputs] -->|Read CSV| B[Staging Layer]
+
+    B -->|Parse datetime<br/>Validate required fields| C[Orders After DQ]
+    C -->|Deduplicate by order_id<br/>Keep latest ingested_at| D[Valid Orders]
+
+    B -->|Validate quantity & price| E[Items After DQ]
+    E -->|Reject orphan items| F[Valid Items]
+
+    D -->|Filter completed orders| G[Completed Orders]
+    F -->|Join| G
+
+    G -->|Aggregate| H[Daily Revenue Mart]
+
+    C --> I[Rejected Orders]
+    E --> J[Rejected Items]
+
+    H --> K[daily_revenue.csv]
+    I --> L[rejected_orders.csv]
+    J --> M[rejected_items.csv]
+    H --> N[quality_report.json]
