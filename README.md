@@ -32,21 +32,23 @@ Key Learning:
 
 ```mermaid
 flowchart TD
-    A[Raw CSV Inputs] -->|Read CSV| B[Staging Layer]
+    A[Raw CSV Inputs] --> B[Staging Layer]
 
-    B -->|Parse datetime<br/>Validate required fields| C[Orders After DQ]
-    C -->|Deduplicate by order_id<br/>Keep latest ingested_at| D[Valid Orders]
+    B --> C[Orders After DQ]
+    B --> E[Items After DQ]
 
-    B -->|Validate quantity & price| E[Items After DQ]
-    E -->|Reject orphan items| F[Valid Items]
+    C -->|Deduplicate by order_id| D[Valid Orders]
+    D -->|Keep latest ingested_at| D
+
+    E -->|Validate quantity and price| F[Valid Items]
+    E -->|Reject orphan items| J[Rejected Items]
 
     D -->|Filter completed orders| G[Completed Orders]
     F -->|Join| G
 
-    G -->|Aggregate| H[Daily Revenue Mart]
+    G -->|Aggregate daily| H[Daily Revenue Mart]
 
     C --> I[Rejected Orders]
-    E --> J[Rejected Items]
 
     H --> K[daily_revenue.csv]
     I --> L[rejected_orders.csv]
